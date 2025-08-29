@@ -1,0 +1,33 @@
+PS C:\WINDOWS\system32> psql 'postgresql://neondb_owner:npg_rMEA06LeCXTp@ep-lingering-flower-acgio13c-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+psql (17.6, servidor 17.5 (1b53132))
+ADVERTENCIA: El código de página de la consola (437) difiere del código
+            de página de Windows (1252).
+            Los caracteres de 8 bits pueden funcionar incorrectamente.
+            Vea la página de referencia de psql «Notes for Windows users»
+            para obtener más detalles.
+Conexión SSL (protocolo: TLSv1.3, cifrado: TLS_AES_256_GCM_SHA384, compresión: desactivado, ALPN: postgresql)
+Digite «help» para obtener ayuda.
+
+neondb=> CREATE TABLE IF NOT EXISTS portfolio (
+neondb(>     id SERIAL PRIMARY KEY,
+neondb(>     title VARCHAR(255) NOT NULL,
+neondb(>     description TEXT NOT NULL,
+neondb(>     category VARCHAR(100) NOT NULL,
+neondb(>     technologies TEXT NOT NULL,
+neondb(>     image_url TEXT NOT NULL,
+neondb(>     demo_url TEXT,
+neondb(>     completed_at TIMESTAMP NOT NULL,
+neondb(>     featured BOOLEAN NOT NULL DEFAULT false,
+neondb(>     is_active BOOLEAN NOT NULL DEFAULT true,
+neondb(>     created_at TIMESTAMP DEFAULT now(),
+neondb(>     updated_at TIMESTAMP DEFAULT now()
+neondb(> );
+CREATE TABLE
+neondb=> INSERT INTO portfolio (title, description, category, technologies, image_url, demo_url, completed_at, featured, is_active) VALUES
+neondb-> ('E-commerce Moderno', 'Plataforma de comercio electrónico con carrito de compras, pagos integrados y panel de administración completo.', 'E-commerce', '["React", "Node.js", "PostgreSQL", "Stripe"]', 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800', 'https://demo-ecommerce.softwarepar.lat', '2024-01-15 10:00:00', true, true),
+neondb-> ('Dashboard Analytics', 'Dashboard interactivo para análisis de datos con gráficos en tiempo real y reportes personalizables.', 'Dashboard', '["Vue.js", "Express", "MongoDB", "Chart.js"]', 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800', 'https://demo-dashboard.softwarepar.lat', '2024-02-10 14:30:00', true, true),
+neondb-> ('App Móvil Delivery', 'Aplicación móvil para delivery de comida con seguimiento en tiempo real y múltiples métodos de pago.', 'Mobile App', '["React Native", "Firebase", "Google Maps"]', 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800', NULL, '2024-03-05 09:15:00', false, true),
+neondb-> ('Sistema CRM', 'Sistema de gestión de relaciones con clientes con automatización de marketing y seguimiento de ventas.', 'Web App', '["Angular", ".NET Core", "SQL Server"]', 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800', 'https://demo-crm.softwarepar.lat', '2024-01-28 16:45:00', false, true),
+neondb-> ('Landing Page Corporativa', 'Sitio web corporativo responsive con animaciones modernas y optimización SEO.', 'Landing Page', '["Next.js", "Tailwind CSS", "Framer Motion"]', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800', 'https://demo-corporate.softwarepar.lat', '2024-02-20 11:20:00', true, true);
+ERROR:  invalid byte sequence for encoding "UTF8": 0xa2
+neondb=>

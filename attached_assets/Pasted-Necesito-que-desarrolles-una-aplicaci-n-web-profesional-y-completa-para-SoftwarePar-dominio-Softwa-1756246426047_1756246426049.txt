@@ -1,0 +1,232 @@
+Necesito que desarrolles una aplicación web profesional y completa para SoftwarePar (dominio: SoftwarePar.Lat) usando una arquitectura Full-Stack moderna con las siguientes especificaciones técnicas:
+
+ARQUITECTURA DEL SISTEMA:
+
+Frontend (React + TypeScript)
+        ↓ (REST API)
+Backend (Node.js + Express)
+        ↓ (Drizzle ORM)
+Base de Datos (PostgreSQL - Neon)
+
+CARACTERÍSTICAS ARQUITECTURALES:
+
+SPA (Single Page Application) con React 18
+API RESTful con Express.js
+ORM Moderno con Drizzle para type-safety
+Multi-tenancy a nivel de base de datos
+Tiempo Real con WebSockets para sincronización
+Sistema de Cache con TanStack Query
+STACK TECNOLÓGICO ESPECÍFICO:
+
+Frontend:
+
+React 18.3.1 - Framework principal
+TypeScript 5.6.3 - Tipado estático
+Vite 5.4.19 - Build tool y dev server
+TailwindCSS 3.4.17 - Framework CSS
+shadcn/ui - Componentes UI modernos
+TanStack Query 5.60.5 - Manejo de estado del servidor
+React Hook Form 7.55.0 - Manejo de formularios
+Wouter 3.3.5 - Routing ligero
+Framer Motion 11.13.1 - Animaciones
+Recharts 2.15.2 - Gráficos y visualizaciones
+Backend:
+
+Node.js - Runtime
+Express 4.21.2 - Framework web
+TypeScript - Lenguaje
+Drizzle ORM 0.39.3 - Object-Relational Mapping
+PostgreSQL (Neon) - Base de datos
+bcryptjs 3.0.2 - Hash de contraseñas
+Zod 3.24.2 - Validación de esquemas
+Nodemailer 7.0.5 - Envío de emails
+ws 8.18.0 - WebSockets
+Librerías de UI/UX:
+
+Radix UI - Primitivos de UI accesibles
+Lucide React 0.453.0 - Iconografía
+date-fns 3.6.0 - Manipulación de fechas
+React Day Picker 8.10.1 - Selector de fechas
+INFORMACIÓN DE LA EMPRESA:
+
+Nombre: SoftwarePar
+Dominio: SoftwarePar.Lat
+País: Argentina
+Especialidad: Desarrollo de software y aplicaciones a medida
+MODELO DE NEGOCIO:
+
+Ofrecemos desarrollo de software/aplicaciones a medida
+Dos modalidades de servicio:
+Compra Completa: Cliente paga precio total y recibe código fuente completo
+Partnership: Cliente paga precio reducido, se convierte en partner y puede revender licencias a colegas de su rubro con comisiones
+Sistema de licencias para partners con comisiones automáticas
+Facturación A disponible para generar confianza empresarial
+CONFIGURACIÓN DE VARIABLES DE ENTORNO (.env):
+
+DATABASE_URL=postgresql://neondb_owner:npg_rMEA06LeCXTp@ep-lingering-flower-acgio13c-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+SESSION_SECRET=K7m9P2wX8qR5nY3vB6jL4sF9tE1uA7zC
+GMAIL_USER=jhonidelacruz89@gmail.com
+GMAIL_PASS=htzmerglesqpdoht
+NODE_ENV=development
+VITE_API_URL=http://localhost:3000/api
+
+FUNCIONALIDADES REQUERIDAS:
+
+1. FRONTEND REACT (SPA):
+
+Landing page PROFESIONAL con componentes shadcn/ui
+Diseño corporativo serio (azul #1e40af, grises elegantes)
+Animaciones suaves con Framer Motion
+Responsive design con TailwindCSS
+Routing con Wouter para navegación SPA
+Formularios con React Hook Form + validación Zod
+Estado global con TanStack Query para cache inteligente
+2. COMPONENTES PRINCIPALES:
+
+Header/Navigation con logo SoftwarePar
+Hero Section impactante pero profesional
+Services Section con cards animadas
+Pricing Table comparativa de modalidades
+Contact Form con validación en tiempo real
+Auth Components (Login/Register modals)
+Dashboard Components para cada tipo de usuario
+3. SISTEMA DE AUTENTICACIÓN MODERNO:
+
+JWT Authentication con refresh tokens
+Formularios tipados con React Hook Form + Zod
+Validación en tiempo real
+Hash seguro con bcryptjs
+Recuperación de contraseñas por email
+Roles diferenciados: Cliente, Partner, Admin
+4. USUARIOS DE PRUEBA PREDETERMINADOS:
+
+const seedUsers = [
+  { email: 'admin@softwarepar.lat', password: 'admin123', role: 'admin' },
+  { email: 'cliente@test.com', password: 'cliente123', role: 'client' },
+  { email: 'partner@test.com', password: 'partner123', role: 'partner' }
+];
+
+5. DASHBOARD PARA PARTNERS (React Components):
+
+Dashboard moderno con gráficos Recharts
+Calculadora de ganancias en tiempo real
+Gestión de licencias con tablas interactivas
+Enlaces de referidos únicos
+Reportes descargables en PDF
+Notificaciones en tiempo real con WebSockets
+6. PANEL DE ADMINISTRACIÓN:
+
+Dashboard administrativo con métricas
+Gestión de usuarios con CRUD completo
+Creación de partners (solo admins)
+Configuración de Mercado Pago editable
+Sistema de tickets/soporte
+Analytics avanzados con visualizaciones
+7. BASE DE DATOS CON DRIZZLE ORM (NEON POSTGRESQL):
+
+// Esquemas principales para Neon PostgreSQL
+const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  role: varchar('role', { length: 50 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+const partners = pgTable('partners', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id),
+  referralCode: varchar('referral_code', { length: 50 }).unique(),
+  commissionRate: decimal('commission_rate', { precision: 5, scale: 2 }),
+});
+
+const projects = pgTable('projects', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  price: decimal('price', { precision: 10, scale: 2 }),
+  status: varchar('status', { length: 50 }),
+  clientId: integer('client_id').references(() => users.id),
+});
+
+8. API RESTful CON EXPRESS + TYPESCRIPT:
+
+// Rutas principales
+POST /api/auth/login
+POST /api/auth/register
+POST /api/auth/forgot-password
+GET  /api/users/profile
+GET  /api/partners/dashboard
+GET  /api/admin/users
+POST /api/admin/partners
+GET  /api/projects
+POST /api/payments/mercadopago
+
+9. SISTEMA DE PAGOS MERCADO PAGO:
+
+Integración REAL con SDK oficial
+Webhooks para confirmación automática
+Configuración editable desde panel admin
+Validación con Zod de todos los datos
+10. SISTEMA DE EMAILS CON NODEMAILER:
+
+Templates HTML profesionales
+Emails transaccionales (registro, recuperación)
+Notificaciones de ventas y comisiones
+DISEÑO PROFESIONAL CON TAILWINDCSS + SHADCN/UI:
+
+Paleta corporativa: Azul #1e40af, grises elegantes
+Componentes modernos de shadcn/ui
+Animaciones sutiles con Framer Motion
+Responsive design mobile-first
+Dark/Light mode opcional
+Accesibilidad con Radix UI
+ESTRUCTURA DEL PROYECTO:
+
+/
+├── frontend/
+│   ├── src/
+│   │   ├── components/ (shadcn/ui components)
+│   │   ├── pages/ (React pages)
+│   │   ├── hooks/ (custom hooks)
+│   │   ├── lib/ (utilities)
+│   │   └── types/ (TypeScript types)
+│   ├── package.json
+│   └── vite.config.ts
+├── backend/
+│   ├── src/
+│   │   ├── routes/ (Express routes)
+│   │   ├── db/ (Drizzle schemas)
+│   │   ├── middleware/
+│   │   └── types/
+│   ├── package.json
+│   └── drizzle.config.ts
+├── shared/
+│   └── types/ (shared TypeScript types)
+└── .env
+
+CONFIGURACIÓN ESPECÍFICA PARA NEON:
+
+Conexión SSL requerida (ya incluida en DATABASE_URL)
+Channel binding habilitado para seguridad
+Pooling optimizado para Neon
+Migraciones con Drizzle Kit para Neon PostgreSQL
+CARACTERÍSTICAS AVANZADAS:
+
+Type-safety completo con TypeScript
+Validación universal con Zod
+Cache inteligente con TanStack Query
+Optimistic updates para mejor UX
+Error boundaries para manejo de errores
+Loading states y skeleton screens
+WebSockets para notificaciones en tiempo real
+IMPORTANTE:
+
+Código limpio y tipado al 100%
+Componentes reutilizables con shadcn/ui
+Performance optimizado con React 18
+SEO friendly con meta tags apropiados
+Testing ready con estructura modular
+Documentación completa en README.md
+Optimizado para Neon PostgreSQL con mejores prácticas
+Por favor, desarrolla esta aplicación Full-Stack moderna y profesional para SoftwarePar, asegurándote de implementar todas las mejores prácticas de desarrollo actual y que sea completamente funcional desde el primer despliegue con la base de datos Neon PostgreSQL.
+

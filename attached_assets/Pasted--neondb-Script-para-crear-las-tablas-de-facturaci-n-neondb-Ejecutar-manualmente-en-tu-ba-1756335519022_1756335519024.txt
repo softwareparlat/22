@@ -1,0 +1,100 @@
+
+neondb=> -- Script para crear las tablas de facturación
+neondb=> -- Ejecutar manualmente en tu base de datos Neon
+neondb=>
+neondb=> -- Crear tabla de métodos de pago
+neondb=> CREATE TABLE IF NOT EXISTS payment_methods (
+neondb(>     id SERIAL PRIMARY KEY,
+neondb(>     user_id INTEGER NOT NULL REFERENCES users(id),
+neondb(>     type VARCHAR(50) NOT NULL, -- 'card', 'bank_transfer', 'mercadopago'
+neondb(>     provider VARCHAR(100), -- 'visa', 'mastercard', 'mercadopago'
+neondb(>     last4 VARCHAR(4),
+neondb(>     expiry_date VARCHAR(7), -- MM/YYYY
+neondb(>     holder_name VARCHAR(255),
+neondb(>     bank_name VARCHAR(255),
+neondb(>     account_number VARCHAR(255),
+neondb(>     is_default BOOLEAN NOT NULL DEFAULT false,
+neondb(>     is_active BOOLEAN NOT NULL DEFAULT true,
+neondb(>     metadata JSONB, -- Para datos específicos del proveedor
+neondb(>     created_at TIMESTAMP DEFAULT NOW(),
+neondb(>     updated_at TIMESTAMP DEFAULT NOW()
+neondb(> );
+ERROR:  invalid byte sequence for encoding "UTF8": 0xa1
+neondb=>
+neondb=> -- Crear tabla de facturas
+neondb=> CREATE TABLE IF NOT EXISTS invoices (
+neondb(>     id SERIAL PRIMARY KEY,
+neondb(>     invoice_number VARCHAR(50) NOT NULL UNIQUE,
+neondb(>     project_id INTEGER NOT NULL REFERENCES projects(id),
+neondb(>     client_id INTEGER NOT NULL REFERENCES users(id),
+neondb(>     amount DECIMAL(12,2) NOT NULL,
+neondb(>     status VARCHAR(50) NOT NULL DEFAULT 'pending', -- 'pending', 'paid', 'overdue', 'cancelled'
+neondb(>     due_date TIMESTAMP NOT NULL,
+neondb(>     paid_date TIMESTAMP,
+neondb(>     description TEXT,
+neondb(>     tax_amount DECIMAL(12,2) DEFAULT 0.00,
+neondb(>     discount_amount DECIMAL(12,2) DEFAULT 0.00,
+neondb(>     total_amount DECIMAL(12,2) NOT NULL,
+neondb(>     payment_method_id INTEGER REFERENCES payment_methods(id),
+neondb(>     notes TEXT,
+neondb(>     created_at TIMESTAMP DEFAULT NOW(),
+neondb(>     updated_at TIMESTAMP DEFAULT NOW()
+neondb(> );
+ERROR:  relation "payment_methods" does not exist
+neondb=>
+neondb=> -- Crear tabla de transacciones
+neondb=> CREATE TABLE IF NOT EXISTS transactions (
+neondb(>     id SERIAL PRIMARY KEY,
+neondb(>     invoice_id INTEGER REFERENCES invoices(id),
+neondb(>     payment_method_id INTEGER REFERENCES payment_methods(id),
+neondb(>     user_id INTEGER NOT NULL REFERENCES users(id),
+neondb(>     type VARCHAR(50) NOT NULL, -- 'payment', 'refund', 'fee'
+neondb(>     amount DECIMAL(12,2) NOT NULL,
+neondb(>     status VARCHAR(50) NOT NULL DEFAULT 'pending', -- 'pending', 'completed', 'failed', 'cancelled'
+neondb(>     description TEXT NOT NULL,
+neondb(>     transaction_id VARCHAR(255), -- ID de transacción externa
+neondb(>     provider_data JSONB, -- Respuesta del proveedor de pagos
+neondb(>     processed_at TIMESTAMP,
+neondb(>     created_at TIMESTAMP DEFAULT NOW()
+neondb(> );
+ERROR:  invalid byte sequence for encoding "UTF8": 0xa2
+neondb=>
+neondb=> -- Crear índices para mejor rendimiento
+neondb=> CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON invoices(client_id);
+ERROR:  relation "invoices" does not exist
+neondb=> CREATE INDEX IF NOT EXISTS idx_invoices_project_id ON invoices(project_id);
+ERROR:  relation "invoices" does not exist
+neondb=> CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+ERROR:  relation "invoices" does not exist
+neondb=> CREATE INDEX IF NOT EXISTS idx_payment_methods_user_id ON payment_methods(user_id);
+ERROR:  relation "payment_methods" does not exist
+neondb=> CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
+ERROR:  relation "transactions" does not exist
+neondb=> CREATE INDEX IF NOT EXISTS idx_transactions_invoice_id ON transactions(invoice_id);
+ERROR:  relation "transactions" does not exist
+neondb=>
+neondb=> -- Insertar datos de ejemplo
+neondb=> INSERT INTO payment_methods (user_id, type, provider, last4, expiry_date, holder_name, is_default)
+neondb-> VALUES
+neondb-> (2, 'card', 'visa', '4532', '12/2026', 'Cliente Test', true),
+neondb-> (2, 'bank_transfer', 'santander', '5678', NULL, 'Cliente Test', false);
+ERROR:  relation "payment_methods" does not exist
+LINEA 1: INSERT INTO payment_methods (user_id, type, provider, last4,...
+                    ^
+neondb=>
+neondb=> -- Insertar facturas de ejemplo
+neondb=> INSERT INTO invoices (invoice_number, project_id, client_id, amount, status, due_date, total_amount, description)
+neondb-> VALUES
+neondb-> ('INV-2024-001', 2, 2, 5000.00, 'paid', '2024-01-15'::timestamp, 5000.00, 'Desarrollo App Mobile - Primera fase'),
+neondb-> ('INV-2024-002', 2, 2, 2500.00, 'pending', '2024-02-15'::timestamp, 2500.00, 'Desarrollo App Mobile - Segunda fase');
+ERROR:  relation "invoices" does not exist
+LINEA 1: INSERT INTO invoices (invoice_number, project_id, client_id,...
+                    ^
+neondb=>
+neondb=> -- Insertar transacciones de ejemplo
+neondb=> INSERT INTO transactions (invoice_id, payment_method_id, user_id, type, amount, status, description, processed_at)
+neondb-> VALUES
+neondb-> (1, 1, 2, 'payment', 5000.00, 'completed', 'Pago de factura INV-2024-001', NOW()),
+neondb-> (1, NULL, 2, 'fee', 150.00, 'completed', 'Comisión MercadoPago', NOW());
+ERROR:  invalid byte sequence for encoding "UTF8": 0xa2
+neondb=>

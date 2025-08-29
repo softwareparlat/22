@@ -1,0 +1,32 @@
+neondb=> \d budget_negotiations
+                                         Tabla ½public.budget_negotiations╗
+    Columna     |            Tipo             | Ordenamiento | Nulable  |                    Por omisi                  
+----------------+-----------------------------+--------------+----------+-------------------------------------------------
+ id             | integer                     |              | not null | nextval('budget_negotiations_id_seq'::regclass)
+ project_id     | integer                     |              | not null |
+ proposed_by    | integer                     |              | not null |
+ original_price | numeric(10,2)               |              | not null |
+ proposed_price | numeric(10,2)               |              | not null |
+ message        | text                        |              |          |
+ status         | text                        |              | not null | 'pending'::text
+ created_at     | timestamp without time zone |              | not null | now()
+ responded_at   | timestamp without time zone |              |          |
+═ndices:
+    "budget_negotiations_pkey" PRIMARY KEY, btree (id)
+    "idx_budget_negotiations_project_id" btree (project_id)
+    "idx_budget_negotiations_proposed_by" btree (proposed_by)
+    "idx_budget_negotiations_status" btree (status)
+Restricciones CHECK:
+    "budget_negotiations_status_check" CHECK (status = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text, 'countered'::text]))
+Restricciones de llave forßnea:
+    "budget_negotiations_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id)
+    "budget_negotiations_proposed_by_fkey" FOREIGN KEY (proposed_by) REFERENCES users(id)
+
+
+neondb=> SELECT * FROM budget_negotiations LIMIT 5;
+ id | project_id | proposed_by | original_price | proposed_price | message | status | created_at | responded_at
+----+------------+-------------+----------------+----------------+---------+--------+------------+--------------
+(0 filas)
+
+
+neondb=>

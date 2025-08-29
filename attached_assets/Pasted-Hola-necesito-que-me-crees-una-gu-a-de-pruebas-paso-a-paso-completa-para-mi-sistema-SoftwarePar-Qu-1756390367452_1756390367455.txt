@@ -1,0 +1,48 @@
+Hola, necesito que me crees una guía de pruebas paso a paso completa para mi sistema SoftwarePar. Quiero que me guíes como si fuera un manual de testing de usuario final, donde me digas exactamente qué hacer en cada paso para probar todas las funcionalidades del sistema.
+
+La guía debe incluir:
+
+PARTE 1 - PREPARACIÓN:
+
+Cómo iniciar la aplicación
+Verificar que todos los servicios estén funcionando
+Comprobar la conexión a la base de datos
+PARTE 2 - PRUEBAS COMO CLIENTE:
+
+Paso 1: Registrarse como nuevo cliente (con datos específicos de ejemplo)
+Paso 2: Iniciar sesión y explorar el dashboard
+Paso 3: Crear un nuevo proyecto (con detalles específicos)
+Paso 4: Subir archivos al proyecto
+Paso 5: Usar el chat/mensajería del proyecto
+Paso 6: Revisar la sección de facturación
+Paso 7: Crear un ticket de soporte
+Paso 8: Verificar notificaciones
+PARTE 3 - PRUEBAS COMO ADMINISTRADOR:
+
+Paso 1: Iniciar sesión como admin (credenciales específicas)
+Paso 2: Revisar el dashboard de administración
+Paso 3: Gestionar usuarios (ver el cliente recién creado)
+Paso 4: Revisar y gestionar el proyecto creado por el cliente
+Paso 5: Responder al ticket de soporte del cliente
+Paso 6: Revisar analytics y métricas
+Paso 7: Gestionar partners
+Paso 8: Administrar el portfolio
+PARTE 4 - PRUEBAS COMO PARTNER:
+
+Paso 1: Acceder con cuenta de partner
+Paso 2: Explorar dashboard de partner
+Paso 3: Verificar sistema de referencias
+Paso 4: Revisar ganancias (si está disponible)
+PARTE 5 - PRUEBAS DE INTEGRACIÓN:
+
+Verificar que las acciones del admin se reflejen en el cliente
+Comprobar notificaciones en tiempo real
+Probar el flujo completo de un proyecto
+Para cada paso, necesito que me digas:
+
+Qué URL visitar o qué botón clickear exactamente
+Qué datos ingresar (con ejemplos específicos)
+Qué debería ver en pantalla
+Cómo verificar que funcionó correctamente
+Qué hacer si algo no funciona
+Hazlo como si fuera un manual de QA profesional, con pasos numerados y muy detallados. Quiero poder seguirlo sin tener que adivinar nada.

@@ -1,0 +1,109 @@
+PS C:\WINDOWS\system32> psql 'postgresql://neondb_owner:npg_rMEA06LeCXTp@ep-lingering-flower-acgio13c-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+psql (17.6, servidor 17.5 (1b53132))
+ADVERTENCIA: El código de página de la consola (437) difiere del código
+            de página de Windows (1252).
+            Los caracteres de 8 bits pueden funcionar incorrectamente.
+            Vea la página de referencia de psql «Notes for Windows users»
+            para obtener más detalles.
+Conexión SSL (protocolo: TLSv1.3, cifrado: TLS_AES_256_GCM_SHA384, compresión: desactivado, ALPN: postgresql)
+Digite «help» para obtener ayuda.
+
+neondb=> -- Script para agregar sistema de pagos por etapas
+neondb=> -- Ejecutar manualmente en tu base de datos NeonDB
+neondb=>
+neondb=> -- 1. Agregar nuevas columnas a la tabla payments
+neondb=> ALTER TABLE payments ADD COLUMN IF NOT EXISTS stage VARCHAR(50) DEFAULT 'full';
+ALTER TABLE
+neondb=> ALTER TABLE payments ADD COLUMN IF NOT EXISTS stage_percentage DECIMAL(5,2) DEFAULT 100.00;
+ALTER TABLE
+neondb=> ALTER TABLE payments ADD COLUMN IF NOT EXISTS mercado_pago_id VARCHAR(255);
+NOTICE:  column "mercado_pago_id" of relation "payments" already exists, skipping
+ALTER TABLE
+neondb=> ALTER TABLE payments ADD COLUMN IF NOT EXISTS payment_data JSONB;
+NOTICE:  column "payment_data" of relation "payments" already exists, skipping
+ALTER TABLE
+neondb=>
+neondb=> -- 2. Crear tabla para gestionar etapas de pago
+neondb=> CREATE TABLE IF NOT EXISTS payment_stages (
+neondb(>   id SERIAL PRIMARY KEY,
+neondb(>   project_id INTEGER REFERENCES projects(id) NOT NULL,
+neondb(>   stage_name VARCHAR(100) NOT NULL,
+neondb(>   stage_percentage DECIMAL(5,2) NOT NULL,
+neondb(>   amount DECIMAL(12,2) NOT NULL,
+neondb(>   required_progress INTEGER NOT NULL, -- Progreso requerido para activar esta etapa
+neondb(>   status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'available', 'paid', 'overdue'
+neondb(>   payment_link VARCHAR(500),
+neondb(>   mercado_pago_id VARCHAR(255),
+neondb(>   due_date TIMESTAMP,
+neondb(>   paid_date TIMESTAMP,
+neondb(>   created_at TIMESTAMP DEFAULT NOW(),
+neondb(>   updated_at TIMESTAMP DEFAULT NOW()
+neondb(> );
+CREATE TABLE
+neondb=>
+neondb=> -- 3. Agregar índices para optimizar consultas
+neondb=> CREATE INDEX IF NOT EXISTS idx_payment_stages_project_id ON payment_stages(project_id);
+CREATE INDEX
+neondb=> CREATE INDEX IF NOT EXISTS idx_payment_stages_status ON payment_stages(status);
+CREATE INDEX
+neondb=>
+neondb=> -- 4. Insertar etapas de pago para proyectos existentes
+neondb=> INSERT INTO payment_stages (project_id, stage_name, stage_percentage, amount, required_progress)
+neondb-> SELECT
+neondb->   id as project_id,
+neondb->   'Inicio del Proyecto' as stage_name,
+neondb->   25.00 as stage_percentage,
+neondb->   (CAST(price AS DECIMAL) * 0.25) as amount,
+neondb->   0 as required_progress
+neondb-> FROM projects
+neondb-> WHERE NOT EXISTS (
+neondb(>   SELECT 1 FROM payment_stages WHERE project_id = projects.id
+neondb(> );
+INSERT 0 1
+neondb=>
+neondb=> INSERT INTO payment_stages (project_id, stage_name, stage_percentage, amount, required_progress)
+neondb-> SELECT
+neondb->   id as project_id,
+neondb->   'Diseño y Prototipo' as stage_name,
+neondb->   25.00 as stage_percentage,
+neondb->   (CAST(price AS DECIMAL) * 0.25) as amount,
+neondb->   25 as required_progress
+neondb-> FROM projects
+neondb-> WHERE NOT EXISTS (
+neondb(>   SELECT 1 FROM payment_stages WHERE project_id = projects.id AND stage_name = 'Diseño y Prototipo'
+neondb(> );
+ERROR:  invalid byte sequence for encoding "UTF8": 0xa4
+neondb=>
+neondb=> INSERT INTO payment_stages (project_id, stage_name, stage_percentage, amount, required_progress)
+neondb-> SELECT
+neondb->   id as project_id,
+neondb->   'Desarrollo Completo' as stage_name,
+neondb->   25.00 as stage_percentage,
+neondb->   (CAST(price AS DECIMAL) * 0.25) as amount,
+neondb->   75 as required_progress
+neondb-> FROM projects
+neondb-> WHERE NOT EXISTS (
+neondb(>   SELECT 1 FROM payment_stages WHERE project_id = projects.id AND stage_name = 'Desarrollo Completo'
+neondb(> );
+INSERT 0 1
+neondb=>
+neondb=> INSERT INTO payment_stages (project_id, stage_name, stage_percentage, amount, required_progress)
+neondb-> SELECT
+neondb->   id as project_id,
+neondb->   'Entrega Final' as stage_name,
+neondb->   25.00 as stage_percentage,
+neondb->   (CAST(price AS DECIMAL) * 0.25) as amount,
+neondb->   100 as required_progress
+neondb-> FROM projects
+neondb-> WHERE NOT EXISTS (
+neondb(>   SELECT 1 FROM payment_stages WHERE project_id = projects.id AND stage_name = 'Entrega Final'
+neondb(> );
+INSERT 0 1
+neondb=>
+neondb=> -- 5. Actualizar primera etapa como disponible para proyectos en progreso
+neondb=> UPDATE payment_stages
+neondb-> SET status = 'available'
+neondb-> WHERE stage_name = 'Inicio del Proyecto'
+neondb-> AND project_id IN (SELECT id FROM projects WHERE status IN ('pending', 'in_progress'));
+UPDATE 1
+neondb=>
